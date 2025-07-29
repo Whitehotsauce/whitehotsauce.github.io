@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red/Black/Green Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 320px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    button {
+      width: 90px;
+      height: 40px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+    .stats {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Color Tracker</h2>
+  <input type="text" id="name" placeholder="Enter your name" />
+  <br />
+  <button onclick="record('red')" style="background-color: red; color: white;">Red</button>
+  <button onclick="record('black')" style="background-color: black; color: white;">Black</button>
+  <button onclick="record('green')" style="background-color: green; color: white;">Green</button>
+  <br />
+  <button onclick="resetData()">Reset</button>
+
+  <div class="stats">
+    <p>Red: <span id="redCount">0</span> (<span id="redPercent">0%</span>)</p>
+    <p>Black: <span id="blackCount">0</span> (<span id="blackPercent">0%</span>)</p>
+    <p>Green: <span id="greenCount">0</span> (<span id="greenPercent">0%</span>)</p>
+  </div>
+
+  <script>
+    let data = { red: 0, black: 0, green: 0 };
+
+    function getKey() {
+      const name = document.getElementById('name').value || 'default';
+      return `tracker_${name.toLowerCase()}`;
+    }
+
+    function saveData() {
+      localStorage.setItem(getKey(), JSON.stringify(data));
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem(getKey());
+      if (saved) {
+        data = JSON.parse(saved);
+        updateDisplay();
+      }
+    }
+
+    function updateDisplay() {
+      const total = data.red + data.black + data.green;
+      const redP = total ? ((data.red / total) * 100).toFixed(1) : 0;
+      const blackP = total ? ((data.black / total) * 100).toFixed(1) : 0;
+      const greenP = total ? ((data.green / total) * 100).toFixed(1) : 0;
+
+      document.getElementById('redCount').textContent = data.red;
+      document.getElementById('blackCount').textContent = data.black;
+      document.getElementById('greenCount').textContent = data.green;
+
+      document.getElementById('redPercent').textContent = redP + '%';
+      document.getElementById('blackPercent').textContent = blackP + '%';
+      document.getElementById('greenPercent').textContent = greenP + '%';
+    }
+
+    function record(color) {
+      if (!['red', 'black', 'green'].includes(color)) return;
+      data[color]++;
+      updateDisplay();
+      saveData();
+    }
+
+    function resetData() {
+      data = { red: 0, black: 0, green: 0 };
+      updateDisplay();
+      saveData();
+    }
+
+    document.getElementById('name').addEventListener('input', () => {
+      loadData();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
